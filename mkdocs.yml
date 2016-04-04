@@ -1,1 +1,8 @@
-site_name: My Docs
+site_name: Quasar Analytics Docs
+site_url: http://docs.quasar-analytics.org
+site_description: Quasar Analytics Documentation
+site_favicon: favicon.png
+use_directory_urls: true
+theme: readthedocs
+pages:
+- Home : index.md
