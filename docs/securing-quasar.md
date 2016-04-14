@@ -1,19 +1,19 @@
-![SlamData Logo](/images/white-logo.png)
+![Quasar Logo](/images/quasar-logo.png)
 
 # Securing the Quasar NoSQL Analytics Engine
 
-<a name="slamdata-introduction"></a>
+<a name="quasar-introduction"></a>
 
 ## Introduction
 
-This guide can assist with configuring NGINX (or other proxy service) and SlamData to limit access based on HTTP authentication and URL paths.
+This guide can assist with configuring Nginx (or other proxy service) and Quasar to limit access based on HTTP authentication and URL paths.
 
-**Note:**
-> SlamData Advanced includes LDAP/OAuth authentication, fine grained authorization and user auditing - all of the security you need for peace of mind in the enterprise.
+This document does not provide instructions on how to setup
+firewall rules or configure applications other than Quasar and Nginx.
 
 ---
 
-There are several methods of restricting access to Quasar.  This Quick Guide focuses on configuring Quasar to run on a specific host with Nginx providing basic http authorization on a separate host. This quick guide does not give detailed instructions on how to setup firewall rules or configure applications other than Quasar and Nginx.
+<a name="assumptions"></a>
 
 ## Assumptions
 
@@ -31,9 +31,9 @@ For the example in this quick guide, we'll continue with the following assumptio
 
 If your IP addresses differ, change as appropriate.
 
+---
 
-* * *
-
+<a name="architecture-overview"></a>
 
 ## Architecture Overview
 
@@ -54,42 +54,45 @@ As can be noted from the above diagram, the network communications path is strai
    returns the results back upstream, through Nginx to the client.
 
 
-* * *
+---
+
+<a name="installing-quasar-manually"></a>
 
 ## Installing Quasar Manually
 
 The first step is to download Quasar and build the source:
 
 ### Download and Build Quasar
-
-    $ git clone https://github.com/slamdata/quasar
-    $ cd quasar
-    $ ./sbt test
-    $ ./sbt 'project web' oneJar
-    $ ./sbt 'project core' oneJar
+```
+$ git clone https://github.com/slamdata/quasar
+$ cd quasar
+$ ./sbt test
+$ ./sbt 'project web' oneJar
+$ ./sbt 'project core' oneJar
+```
 
 These commands will download the latest source code, run the test suite,
 and build both the Web and Core projects jar files.
 
 ### Configure Quasar
 
-Configure the Quasar server to connect to MongoDB.  Assuming there is a MongoDB
-databased called 'testdb' running on 192.168.138.220, your configuration file may
-be called quasar-config.json and look like this:
+Configure the Quasar server to connect to MongoDB.  Assuming there
+is a MongoDB database called "testdb" running on 192.168.138.220, your configuration file may be called quasar-config.json and look like this:
 
-    {
-      "mountings": {
-          "/local": {
-              "mongodb": {
-                  "connectionUri": "mongodb://192.168.138.220/testdb"
-              }
+```
+{
+  "mountings": {
+      "/local": {
+          "mongodb": {
+              "connectionUri": "mongodb://192.168.138.220/testdb"
           }
-      },
-      "server": { "port": 8080 }
-    }
+      }
+  },
+  "server": { "port": 8080 }
+}
+```
 
-For further details on the format of the configuration file, please see the
-Quasar [Configuration](http://slamdata.com/documentation/back-end-manual/#configuration) documentation.
+For further details on the format of the configuration file, please see the Quasar [Configuration](http://slamdata.com/documentation/back-end-manual/#configuration) documentation.
 
 
 ### Testing Quasar
@@ -99,7 +102,9 @@ Quasar [Configuration](http://slamdata.com/documentation/back-end-manual/#config
 
 From the Quasar server, run the core jar file to verify you have connectivity and your mounting is correct:
 
-    java -jar ~/quasar/core/target/scala-2.11/core_2.11-2.2.1-SNAPSHOT-one-jar.jar ~/quasar-config.json
+```
+java -jar ~/quasar/core/target/scala-2.11/core_2.11-2.2.1-SNAPSHOT-one-jar.jar ~/quasar-config.json
+```
 
 Once launched, a [REPL](https://en.wikipedia.org/wiki/Read–eval–print_loop) console will appear representing
 a virtual file system where each MongoDB database is a directory, and each database directory contains one
@@ -107,63 +112,75 @@ or more MongoDB collections.
 
 Notice how the the OS-like file system commands and SQL commands are executed directly after the $ prompt:
 
-    💪 $ ls
-    local@
-    💪 $ cd local
-    💪 $ ls
-    local/
-    quasar-test/
-    testdb/
-    💪 $ cd testdb
-    💪 $ ls
-    coll1
-    💪 $ select * from coll1;
-    Mongo
-    db.coll1.find();
+```
+💪 $ ls
+local@
+💪 $ cd local
+💪 $ ls
+local/
+quasar-test/
+testdb/
+💪 $ cd testdb
+💪 $ ls
+coll1
+💪 $ select * from coll1;
+Mongo
+db.coll1.find();
 
 
-    Query time: 0.0s
-     name    | age   | gender  | minor  |
-    ---------|-------|---------|--------|
-     Johnny  |  42.0 | male    |  false |
-     Jenny   |  27.0 | female  |  false |
-     Deb     |  33.0 | female  |  false |
-     Billy   |  15.0 | male    |   true |
+Query time: 0.0s
+ name    | age   | gender  | minor  |
+---------|-------|---------|--------|
+ Johnny  |  42.0 | male    |  false |
+ Jenny   |  27.0 | female  |  false |
+ Deb     |  33.0 | female  |  false |
+ Billy   |  15.0 | male    |   true |
 
+```
 
 #### Start the Web jar file
 
 Once you have verified proper connectivity between Quasar and MongoDB, stop the Core jar file
 and now start the Web jar file with a slightly different syntax to point to the configuration file:
 
-    java -jar ~/quasar/web/target/scala-2.11/web_2.11-2.2.1-SNAPSHOT-one-jar.jar -c ~/quasar-config.json
+```
+java -jar ~/quasar/web/target/scala-2.11/web_2.11-2.2.1-SNAPSHOT-one-jar.jar -c ~/quasar-config.json
+```
 
 Congratulations!  You now have two of the three necessary systems up and running for this configuration.
 
 
-* * *
+---
 
+<a name="installing-nginx"></a>
 
 ## Installing Nginx
 
 ### OS X
+
 On OS X systems, consider using [HomeBrew](http://brew.sh/) to install Nginx:
 
-    $ brew install nginx
+```
+$ brew install nginx
+```
 
 ### Redhat / CentOS
+
 On RedHat or CentOS systems:
 
-    $ sudo yum install nginx
+```
+$ sudo yum install nginx
+```
 
 ### Ubuntu / Debian
+
 On Ubuntu or Debian systems:
 
-    $ sudo apt-get install nginx
+```
+$ sudo apt-get install nginx
+```
 
-
-
-* * *
+---
 
 
 ## Configuring Nginx
@@ -172,8 +189,7 @@ There are two main reasons we'll modify the Nginx configuration file in this gui
 
 1. To force user authentication, thus restricting access to known individuals
 
-2. To redirect queries to the Quasar engine on another host, thus limiting the
-   access path to the Quasar API to individuals authenticated with Nginx.
+2. To redirect queries to the Quasar engine on another host, thus limiting the access path to the Quasar API to individuals authenticated with Nginx.
 
 By combining firewall rules on the Quasar server that only allow HTTP requests from the Nginx server, we essentially limit all communication to the Quasar API from only a single system which also forces user
 authentication.
@@ -182,32 +198,40 @@ This example will use the 'default' Nginx site configuration. Nginx has many con
 
 If Nginx is already running, stop it:
 
-    sudo service nginx stop
+```
+sudo service nginx stop
+```
 
 ### Setting up Authentication
 To allow http authentication, we'll need to create a file which stores the names and passwords of allowed individuals.  To do this, use the apache2-utils package which provides those tools:
 
-    sudo apt-get install apache2-utils
+```
+sudo apt-get install apache2-utils
+```
 
 Now create the htpasswd file we'll use to store the encrypted data:
 
-    sudo htpasswd -c /etc/nginx/.htpasswd exampleuser
+```
+sudo htpasswd -c /etc/nginx/.htpasswd exampleuser
+```
 
-Replace 'exampleuser' with a real username.  You'll then be prompted for a password and verification password. This creates the file /etc/nginx/.htpasswd which we will reference in the Nginx configuration file below. Assuming the Nginx site configuration file is located at /etc/nginx/sites-available/default, paste the following code directly after the 'server {' declaration, somewhere around line 20:
+Replace "exampleuser" with a real username.  You'll then be prompted for a password and verification password. This creates the file /etc/nginx/.htpasswd which we will reference in the Nginx configuration file below. Assuming the Nginx site configuration file is located at /etc/nginx/sites-available/default, paste the following code directly after the 'server {' declaration, somewhere around line 20:
 
-    listen 80;
-    server_name your_nginx_server_name;
-    access_log /var/log/nginx/access.log;
-    error_log /var/log/nginx/error.log;
+```
+listen 80;
+server_name your_nginx_server_name;
+access_log /var/log/nginx/access.log;
+error_log /var/log/nginx/error.log;
 
-    location / {
-            auth_basic "Restricted";
-            auth_basic_user_file /etc/nginx/.htpasswd;
-            proxy_set_header X-Forwarder-For $proxy_add_x_forwarded_for;
-            proxy_set_header Host $http_host;
-            proxy_redirect off;
-            proxy_pass http://192.168.138.210:8080;
-    }
+location / {
+        auth_basic "Restricted";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+        proxy_set_header X-Forwarder-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        proxy_pass http://192.168.138.210:8080;
+}
+```
 
 The configuration above ensures the following important actions:
 
@@ -219,10 +243,10 @@ The configuration above ensures the following important actions:
 
 Save the configuration and start or restart Nginx:
 
-    sudo service nginx restart
+```
+sudo service nginx restart
+```
 
-At this point the Quasar application should be shielded from all requests except those coming directly from the Nginx host.  Additionally all requests coming from the Nginx host should only originate from authenticated users via http authentication. Test authentication with a browser.  Use the URL based on the quasar-config.json file above:
-
-    http://192.168.138.210/fs/data/local/testdb/coll1
+At this point the Quasar application should be shielded from all requests except those coming directly from the Nginx host.  Additionally all requests coming from the Nginx host should only originate from authenticated users via http authentication. Test authentication with a browser.  Use the URL based on the quasar-config.json file above: `http://192.168.138.210/fs/data/local/testdb/coll1`
 
 An authentication prompt should appear.  Enter the username and password you specified with the htpasswd command above.  If successful, Quasar should then you the entire 'coll1' collection in JSON format Note that you are sending the request to Nginx (IP .210), which authenticates a username, sends the request to Quasar, then returns the results directly to the browser.  The browser itself is not redirected as that would defeat the purpose of securing with Nginx.

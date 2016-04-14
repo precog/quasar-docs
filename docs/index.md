@@ -1,17 +1,20 @@
-# Welcome to MkDocs
+![Quasar Logo](/images/quasar-logo.png)
 
-For full documentation visit [mkdocs.org](http://mkdocs.org).
+Quasar is the first native NoSQL analytics engine.
 
-## Commands
+To get started, you simply need an existing data source (currently MongoDB is supported) and
+access to the command line on a Windows, Mac or Linux system.
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs help` - Print this help message.
+The fastest way to get started with Quasar is to follow the SQL<sup>2</sup> tutorial link:
 
-## Project layout
+* [SQL² Tutorial](tutorial-sql-squared.md)
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+Once you have finished and understand how to use both SQL<sup>2</sup> and
+the Quasar REPL console, you can start to build applications that utilize the
+Web API as well.
+
+Ready to use Quasar in production?  You can secure Quasar and
+even contribute your own changes to the source code using these links:
+
+* [Securing Quasar](securing-quasar.md)
+* [Contributing](http://quasar-analytics.org/#joinus)

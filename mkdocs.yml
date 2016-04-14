@@ -1,4 +1,4 @@
-site_name: Quasar Analytics Docs
+site_name: Quasar Analytics Documentation
 site_url: http://docs.quasar-analytics.org
 site_description: Quasar Analytics Documentation
 site_favicon: favicon.png
@@ -6,3 +6,9 @@ use_directory_urls: true
 theme: readthedocs
 pages:
 - Home : index.md
+- Install Guide : install-guide.md
+- Tutorial (SQL²) : tutorial-sql-squared.md
+- Securing Quasar : securing-quasar.md
+- Reference (SQL²) : sql-squared-reference.md
+- REST API : restapi.md
+- Scaladoc : scaladoc.md
