@@ -1,4 +1,4 @@
-![Quasar Logo](/images/quasar-logo.png)
+![Quasar Logo](images/quasar-logo.png)
 
 # SQL<sup>2</sup> Reference
 

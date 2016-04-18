@@ -1,4 +1,4 @@
-![Quasar Logo](/images/quasar-logo.png)
+![Quasar Logo](images/quasar-logo.png)
 
 Quasar is the first native NoSQL analytics engine.
 

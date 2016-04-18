@@ -1,4 +1,4 @@
-![Quasar Logo](/images/quasar-logo.png)
+![Quasar Logo](images/quasar-logo.png)
 
 # Securing the Quasar NoSQL Analytics Engine
 
@@ -37,7 +37,7 @@ If your IP addresses differ, change as appropriate.
 
 ## Architecture Overview
 
-![Architecture Overview](/images/restrict-quasar.png)
+![Architecture Overview](images/restrict-quasar.png)
 
 As can be noted from the above diagram, the network communications path is straight forward:
 
