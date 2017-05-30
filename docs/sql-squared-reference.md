@@ -56,7 +56,7 @@ The following clauses are supported:
 
 | Type        | Clauses                                                                   |
 |-------------|---------------------------------------------------------------------------|
-| Basic       | `SELECT`, `AS`, `FROM`, `CREATE FUNCTION`                                 |
+| Basic       | `SELECT`, `AS`, `FROM`, `CREATE FUNCTION`, `IMPORT`                       |
 | Joins       | `LEFT OUTER JOIN`, `RIGHT OUTER JOIN`, `INNER JOIN`, `FULL JOIN`, `CROSS` |
 | Filtering   | `WHERE`                                                                   |
 | Grouping    | `GROUP BY`, `HAVING`                                                      |
@@ -105,14 +105,14 @@ The following functions are supported natively:
 | Aggregation | `COUNT`, `SUM`, `MIN`, `MAX`, `AVG`                         |
 | Identity    | `SQUASH`                                                    |
 
-Function names are case-insensitive. i.e. `CONCAT` and `concat` as synonimous.
+Function names are case-insensitive. i.e. `CONCAT` and `concat` are synonimous.
 
 #### User Defined Functions
 
-You can define your own functions using the `CREATE FUNCTION` clause.
+You can define your own functions using the `CREATE FUNCTION` clause. Functions can only be defined at the top level, they cannot be defined within another SQL expression.
 
-```json
-{ "module": "CREATE FUNCTION ARRAY_LENGTH(:foo) BEGIN COUNT(:foo[_]) END; CREATE FUNCTION USER_DATA(:user_id) BEGIN SELECT * FROM `/root/path/data/` WHERE user_id = :user_id END" }
+```
+CREATE FUNCTION ARRAY_LENGTH(:foo) BEGIN COUNT(:foo[_]) END;
 ```
 
 Like built-in functions, user defined functions are case-insensitive.
@@ -637,6 +637,15 @@ SELECT COALESCE(c.fullName, c.firstName) AS name FROM `/users` AS c
 ```
 
 ---
+
+### Imports
+
+Imports allow you to you to bring into scope all function definitions defined within a SQL module. Like user-defined functions, `IMPORT` is a top level construct only, that is it canoot appear within a SQL expression, it must preceed any SQL expression that makes use of the imported functions.
+
+```
+IMPORT `/my/module/`
+IMPORT `relative/module`
+```
 
 <a name="database-specific-notes"></a>
 
