@@ -56,7 +56,7 @@ The following clauses are supported:
 
 | Type        | Clauses                                                                   |
 |-------------|---------------------------------------------------------------------------|
-| Basic       | `SELECT`, `AS`, `FROM`                                                    |
+| Basic       | `SELECT`, `AS`, `FROM`, `CREATE FUNCTION`                                 |
 | Joins       | `LEFT OUTER JOIN`, `RIGHT OUTER JOIN`, `INNER JOIN`, `FULL JOIN`, `CROSS` |
 | Filtering   | `WHERE`                                                                   |
 | Grouping    | `GROUP BY`, `HAVING`                                                      |
@@ -88,7 +88,11 @@ The following operators are supported:
 >for example, if `xy` is an array with two values, then  `c.xy || [0]` will create an
 >array with three values, where the third value is zero.
 
-The following functions are supported:
+### Functions
+
+#### Built-in Functions
+
+The following functions are supported natively:
 
 | Type        | Functions |
 |-------------|-------------------------------------------------------------|
@@ -100,6 +104,18 @@ The following functions are supported:
 | Set-Level   | `DISTINCT`, `DISTINCT_BY`                                   |
 | Aggregation | `COUNT`, `SUM`, `MIN`, `MAX`, `AVG`                         |
 | Identity    | `SQUASH`                                                    |
+
+Function names are case-insensitive. i.e. `CONCAT` and `concat` as synonimous.
+
+#### User Defined Functions
+
+You can define your own functions using the `CREATE FUNCTION` clause.
+
+```json
+{ "module": "CREATE FUNCTION ARRAY_LENGTH(:foo) BEGIN COUNT(:foo[_]) END; CREATE FUNCTION USER_DATA(:user_id) BEGIN SELECT * FROM `/root/path/data/` WHERE user_id = :user_id END" }
+```
+
+Like built-in functions, user defined functions are case-insensitive.
 
 ---
 
