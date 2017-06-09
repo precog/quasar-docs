@@ -640,11 +640,11 @@ SELECT COALESCE(c.fullName, c.firstName) AS name FROM `/users` AS c
 
 ### Imports
 
-Imports allow you to bring into scope all function definitions defined within a SQL module. Like user-defined functions, `IMPORT` is a top level construct only, that is it canoot appear within a SQL expression, it must preceed any SQL expression that makes use of the imported functions.
+Imports allow you to bring into scope all function definitions defined within a SQL module. Like user-defined functions, `IMPORT` is a top level construct only, that is it cannot appear within a SQL expression, it must preceed any SQL expression that makes use of the imported functions.
 
 ```
-IMPORT `/my/module/`
-IMPORT `relative/module`
+IMPORT `/my/module/`;
+IMPORT `relative/module`;
 ```
 
 <a name="database-specific-notes"></a>
